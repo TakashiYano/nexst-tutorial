@@ -1,10 +1,19 @@
-import Head from "next/head";
 import Layout from "../../components/layout";
+import { getAllPostIds, getPostData } from "../../lib/posts";
+import Head from "next/head";
 import Date from "../../components/date";
 import utilStyles from "../../styles/utils.module.css";
-import { getAllPostIds, getPostData } from "../../lib/posts";
+import { GetStaticProps, GetStaticPaths } from "next";
 
-export default function Post({ postData }) {
+export default function Post({
+  postData,
+}: {
+  postData: {
+    title: string;
+    date: string;
+    contentHtml: string;
+  };
+}) {
   return (
     <Layout>
       <Head>
@@ -22,20 +31,20 @@ export default function Post({ postData }) {
 }
 
 // 動的ページ(ブログなどの個人のページ)SSGの場合
-export async function getStaticPaths() {
+export const getStaticPaths: GetStaticPaths = async () => {
   const paths = getAllPostIds();
   return {
     paths,
     fallback: false,
     // 存在しない動的パスで404を返す。trueの場合、自分で処理を作成できる(redirect処理など)。
   };
-}
+};
 
-export async function getStaticProps({ params }) {
-  const postData = await getPostData(params.id);
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const postData = await getPostData(params.id as string);
   return {
     props: {
       postData,
     },
   };
-}
+};
